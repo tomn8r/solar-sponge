@@ -1,7 +1,7 @@
-"""Constants for the SolarReserve integration."""
+"""Constants for the Solar Sponge Automation integration."""
 
-DOMAIN = "solar_reserve"
-NAME = "SolarReserve"
+DOMAIN = "solar_sponge"
+NAME = "HA Solar Reserve"
 
 # Configuration Keys
 CONF_TOTAL_HOME_ENERGY = "total_home_energy"

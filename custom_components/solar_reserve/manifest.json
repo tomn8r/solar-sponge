@@ -1,12 +1,12 @@
 {
-  "domain": "solar_reserve",
-  "name": "SolarReserve",
+  "domain": "solar_sponge",
+  "name": "HA Solar Reserve",
   "codeowners": [],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/tomn8r/HA-Solar-Reserve",
+  "documentation": "https://github.com/tomn8r/ha-solar-sponge.git",
   "integration_type": "hub",
   "iot_class": "calculated",
   "requirements": [],
-  "version": "2.0.0"
+  "version": "1.2.0"
 }
