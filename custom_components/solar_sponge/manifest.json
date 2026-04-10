@@ -1,0 +1,12 @@
+{
+  "domain": "solar_sponge",
+  "name": "Solar Sponge Automation",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/your-username/solar-sponge",
+  "integration_type": "hub",
+  "iot_class": "calculated",
+  "requirements": [],
+  "version": "1.0.0"
+}

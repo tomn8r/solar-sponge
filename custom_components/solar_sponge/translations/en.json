@@ -1,0 +1,36 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Step 1: House & Solar Energy Inputs",
+        "description": "Select the sensors required to track your house's real baseline load and available solar.",
+        "data": {
+          "total_home_energy": "Total Home Energy (Cumulative kWh)",
+          "ac_energy": "AC Energy Sensor (Optional. Isolates AC usage to find baseline)",
+          "meter_resets_daily": "Does your energy meter reset daily?",
+          "solar_remaining_today": "Solar Forecast Remaining Today (kWh)",
+          "solar_tomorrow": "Solar Forecast Tomorrow 24h (kWh)"
+        }
+      },
+      "battery": {
+        "title": "Step 2: Battery Constraints",
+        "description": "Provide the details of your battery so the system can calculate reserves.",
+        "data": {
+          "battery_remaining": "Battery Status Sensor",
+          "battery_sensor_type": "Does your battery sensor report Energy (kWh) or Percentage (%)?",
+          "battery_capacity": "Total Battery Capacity (Type a fixed number or sensor entity)",
+          "emergency_reserve_percent": "Emergency Battery Reserve Floor (%)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "invalid_capacity": "Capacity must be an entity ID (sensor.*) or a number between 0 and 500 with max 2 decimals.",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}
