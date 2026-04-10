@@ -75,7 +75,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(config_entry):
         """Get the options flow for this handler."""
-        return OptionsFlowHandler(config_entry)
+        return OptionsFlowHandler()
 
     def __init__(self):
         """Initialize flow."""
@@ -119,13 +119,13 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class OptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options flow for Solar Sponge."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry):
+    def __init__(self):
         """Initialize options flow."""
-        self.config_entry = config_entry
-        self.options_data = {**config_entry.data, **config_entry.options}
+        self.options_data = {}
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
+        self.options_data = {**self.config_entry.data, **self.config_entry.options}
         return await self.async_step_user()
         
     async def async_step_user(self, user_input=None):
