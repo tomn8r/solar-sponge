@@ -47,11 +47,11 @@ The core of the integration is measuring `Surplus`. Specifically:
 
 `Tomorrow's Deficit` asks the question: *Is tomorrow's Solar forecast enough to cover my house's average Daytime and Nighttime usage for the following 24 hours?* If the answer is no, it holds the difference back in the battery tonight to guarantee survival.
 
-If `(Available Energy - Required Energy)` is greater than 0, the exposed `binary_sensor.solar_sponge_permission` turns `on`!
+If `(Available Energy - Required Energy)` is greater than 0, the exposed `binary_sensor.solar_reserve_permission` turns `on`!
 
 ## Exposed Sensors
 The integration automatically creates several sensors under its registered **SolarReserve** device:
-- `binary_sensor.solar_sponge_permission`: The master switch used to automate your appliances.
+- `binary_sensor.solar_reserve_permission`: The master switch used to automate your appliances.
 - `sensor.overnight_load_tracker`: Your true baseline energy used during the current/last night.
 - `sensor.daytime_load_tracker`: Your true baseline energy used during the current/last day.
 - `sensor.average_overnight_load`: The 7-day rolling average of your overnight load.

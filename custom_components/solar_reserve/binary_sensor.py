@@ -21,8 +21,8 @@ class SolarSpongePermission(CoordinatorEntity, BinarySensorEntity):
         """Initialize."""
         super().__init__(coordinator)
         self._entry = entry
-        self._attr_name = "Solar Sponge Permission"
-        self._attr_unique_id = f"{entry.entry_id}_solar_sponge_permission"
+        self._attr_name = "SolarReserve Permission"
+        self._attr_unique_id = f"{entry.entry_id}_solar_reserve_permission"
         self._attr_device_class = BinarySensorDeviceClass.POWER
         self._attr_icon = "mdi:sun-snowflake"
 
