@@ -9,6 +9,7 @@ from homeassistant.helpers.storage import Store
 from .const import (
     DOMAIN,
     CONF_TOTAL_HOME_ENERGY,
+    CONF_BATTERY_REMAINING,
     CONF_SOLAR_REMAINING_TODAY,
     CONF_SOLAR_TOMORROW,
     CONF_METER_RESETS_DAILY,
