@@ -75,6 +75,13 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             # Load trackers exposed here so sensors update via coordinator signal
             "overnight_load_tracker": 0.0,
             "daytime_load_tracker": 0.0,
+            # Diagnostic sensors
+            "energy_available_kwh": 0.0,
+            "energy_required_kwh": 0.0,
+            "resolved_battery_capacity_kwh": 10.0,
+            "managed_load_usage_kwh": 0.0,
+            "night_data_days": 0,
+            "day_data_days": 0,
         }
 
     def _get_config(self, key, default=None):
@@ -299,6 +306,8 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
                 except (ValueError, TypeError):
                     capacity = 10.0
 
+        self.calculated_data["resolved_battery_capacity_kwh"] = round(capacity, 2)
+
         # --- Current battery level ---
         battery_sensor_state = self._safe_float(self._get_config(CONF_BATTERY_REMAINING))
         sensor_type = self._get_config(CONF_BATTERY_SENSOR_TYPE, "energy")
@@ -310,6 +319,9 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
 
         solar_today = self._safe_float(self._get_config(CONF_SOLAR_REMAINING_TODAY))
         solar_tomorrow = self._safe_float(self._get_config(CONF_SOLAR_TOMORROW))
+
+        energy_available = current_battery + solar_today
+        self.calculated_data["energy_available_kwh"] = round(energy_available, 2)
 
         avg_night_load = self.calculated_data["avg_night_load"]
         avg_day_load = self.calculated_data["avg_day_load"]
@@ -327,10 +339,17 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             )
             used_so_far_tonight = max(0.0, home_used - ac_used)
             load_expected = max(0.0, avg_night_load - used_so_far_tonight)
+            managed_load_used = self._get_usage_since(
+                self._get_config(CONF_LOAD_ENERGY), "sunset_ac_energy", "max_ac_energy_since_sunset"
+            )
         else:
             load_expected = avg_night_load
+            managed_load_used = self._get_usage_since(
+                self._get_config(CONF_LOAD_ENERGY), "sunrise_ac_energy", "max_ac_energy_since_sunrise"
+            )
 
         self.calculated_data["dynamic_expected_load"] = load_expected
+        self.calculated_data["managed_load_usage_kwh"] = round(managed_load_used, 3)
 
         # --- 36-Hour deficit engine ---
         tomorrow_expected_usage = avg_day_load + avg_night_load
@@ -342,7 +361,14 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
         total_reserve = tomorrow_deficit + emergency_reserve
 
         # --- Final surplus ---
-        surplus = (current_battery + solar_today) - (load_expected + total_reserve)
+        energy_required = load_expected + total_reserve
+        self.calculated_data["energy_required_kwh"] = round(energy_required, 2)
+
+        # --- Data warm-up progress ---
+        self.calculated_data["night_data_days"] = len(self.data_store.get("daily_loads", []))
+        self.calculated_data["day_data_days"] = len(self.data_store.get("daily_day_loads", []))
+
+        surplus = energy_available - energy_required
 
         self.calculated_data["surplus_kwh"] = surplus
         self.calculated_data["permission"] = surplus > 0
