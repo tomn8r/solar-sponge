@@ -1,58 +1,59 @@
 # HA Solar Reserve
 
-A highly advanced, dynamic Home Assistant custom integration designed to intelligently manage high-energy loads (like a "Solar Sponge" AC system) based on real-time solar forecasts and rolling historical energy usage.
+HA Solar Reserve is a Home Assistant integration that dynamically manages high-energy loads by predicting battery requirements. It analyzes historical consumption patterns and upcoming solar forecasts to determine if surplus energy can safely be used by "managed" appliances (e.g., AC units, pool heaters, or EV chargers) without compromising essential house operations.
 
-Instead of relying on arbitrary static battery reserves, Solar Sponge uses a **36-Hour Predictive Engine** to automatically calculate exactly how much battery power you need to survive tonight and tomorrow, guaranteeing your battery is never unnecessarily depleted by thirsty smart appliances.
+## Core Functionality
+
+The integration monitors the balance between available and required energy:
+
+*   **Available Energy**: Current battery storage + remaining solar forecast for today.
+*   **Required Energy**: Remaining house load for the current period (day/night) + tomorrow's projected solar deficit + emergency reserve.
+*   **Permission**: A binary sensor (`binary_sensor.solar_reserve_permission`) toggles `on` when available energy exceeds the required threshold.
+
+### Dynamic Load Modeling
+The engine maintains a 7-day rolling average of house consumption, split into daytime and nighttime baselines.
+- **Time Proration**: During the active period, the expected load is prorated based on time elapsed. This ensures a consistent reserve is maintained even if consumption exceeds the average early in the session.
+- **Morning Dead-Zone Buffer**: A configurable time buffer (default 1.5 hours) allows the system to reserve enough energy to cover the gap between astronomical sunrise and functional solar generation.
+- **36-Hour Lookahead**: If tomorrow's solar forecast is insufficient to cover tomorrow's expected loads, the engine will reserve additional capacity from today's battery/solar to cover the deficit.
 
 ## Features
 
-- **36-Hour Predictive Engine**: Dynamically calculates the deficit between tomorrow's expected solar harvest and your next 24-hours of expected house load. It adjusts your battery reserve in real-time.
-- **Symmetrical Load Tracking**: Automatically tracks the exact amount of energy your house uses between Sunrise and Sunset (Day Load) and Sunset and Sunrise (Night Load).
-- **Managed Load Isolation**: Optionally specify a **Managed Load Energy Sensor** for any high-energy device you want excluded from your home's baseline (e.g. AC unit, EV charger, heated pool, sauna). The integration mathematically removes that device's consumption from your Total Home Energy, so running it doesn't create a false feedback loop inflating your expected baseline load.
-- **Unit Auto-Scaling**: Flawlessly supports `Wh`, `kWh`, and `MWh` sensors natively, auto-scaling them behind the scenes.
-- **Dynamic Configuration (Options Flow)**: Tweak your Emergency Reserve, change your Battery definitions, or swap out sensors on the fly without deleting the integration.
-- **Legacy Meter Support**: The mathematical engine seamlessly handles both perpetually cumulative energy meters and legacy meters that reset to zero at midnight.
+- **Managed Load Isolation**: Link a specific energy sensor to exclude a device from your baseline. This prevents high-energy usage from inflating your reported "average" load.
+- **Auto-Scaling**: Natively supports Wh, kWh, and MWh unit measurements.
+- **Meter Flexibility**: Supports both perpetually cumulative energy meters and those that reset daily.
+- **Resilient Logic**: Logic is calculated locally and persists across Home Assistant restarts.
 
-## Requirements
+## Configuration Requirements
 
-To use this integration, you must have the following entities available in Home Assistant:
-1. **Total Home Energy Sensor**: A cumulative energy sensor (kWh).
-2. **Solar Forecast Sensors**: Two sensors detailing your Solar Forecast Remaining Today and Solar Forecast Tomorrow.
-3. **Battery Sensor**: A sensor detailing your battery's current state of charge (either in kWh or %).
-4. **sun.sun**: The native Home Assistant sun tracker must be enabled.
+The integration requires the following sensors:
+1.  **Total Home Energy**: Cumulative house energy consumption (kWh/Wh).
+2.  **Solar Forecast Today**: The remaining solar generation expected for the current day.
+3.  **Solar Forecast Tomorrow**: The total solar generation expected for the next day.
+4.  **Battery Sensor**: Current battery energy (kWh) or State of Charge (%).
 
 ## Installation
 
-### Method 1: HACS (Recommended)
-1. Open Home Assistant and navigate to **HACS**.
-2. Click **Integrations** -> **Custom repositories** (three dots in top right).
-3. Add the URL to this repository and select `Integration` as the category.
-4. Click **Download** and restart Home Assistant.
+### HACS (Recommended)
+1.  Open **HACS** in Home Assistant.
+2.  Navigate to **Integrations** and select **Custom repositories** from the menu.
+3.  Add this repository URL with the category `Integration`.
+4.  Select **Download** and restart Home Assistant.
 
-### Method 2: Manual Installation
-1. Download the `solar_reserve` folder from the `custom_components` directory in this repository.
-2. Copy the folder to your Home Assistant `custom_components` directory (`/config/custom_components/solar_reserve`).
-3. Restart Home Assistant.
+### Manual
+1.  Copy the `custom_components/solar_reserve` directory into your Home Assistant `custom_components` folder.
+2.  Restart Home Assistant.
 
-## Configuration
+## Setup
 
-1. Navigate to **Settings -> Devices & Services**.
-2. Click **+ Add Integration** and search for `HA Solar Reserve`.
-3. Follow the two-step wizard to map your energy inputs and battery constraints.
+1.  Navigate to **Settings -> Devices & Services**.
+2.  Click **Add Integration** and search for `HA Solar Reserve`.
+3.  Complete the two-step configuration wizard. To adjust settings later (such as the Morning Buffer), click the **Configure** button on the integration card.
 
-### Understanding the 36-Hour Deficit Calculation
-The core of the integration is measuring `Surplus`. Specifically:
-`Available Energy = (Current Battery Energy + Solar Remaining Today)`
-`Required Energy = (Expected Load Tonight + Tomorrow's Deficit + Emergency Reserve)`
+## Diagnostic Entities
 
-`Tomorrow's Deficit` asks the question: *Is tomorrow's Solar forecast enough to cover my house's average Daytime and Nighttime usage for the following 24 hours?* If the answer is no, it holds the difference back in the battery tonight to guarantee survival.
-
-If `(Available Energy - Required Energy)` is greater than 0, the exposed `binary_sensor.solar_reserve_permission` turns `on`!
-
-## Exposed Sensors
-The integration automatically creates several sensors under its registered **HA Solar Reserve** device:
-- `binary_sensor.solar_reserve_permission`: The master switch used to automate your appliances.
-- `sensor.overnight_load_tracker`: Your true baseline energy used during the current/last night.
-- `sensor.daytime_load_tracker`: Your true baseline energy used during the current/last day.
-- `sensor.average_overnight_load`: The 7-day rolling average of your overnight load.
-- `sensor.average_daytime_load`: The 7-day rolling average of your daytime load.
+The following entities are provided for automation and monitoring:
+- `binary_sensor.solar_reserve_permission`: The primary state for automation triggers.
+- `sensor.average_daytime_load`: Historical rolling average of house consumption during daylight.
+- `sensor.average_overnight_load`: Historical rolling average of house consumption at night.
+- `sensor.surplus_energy`: The calculated kWh difference between available and required energy.
+- `sensor.energy_required`: The total calculated kWh reserve currently needed.
