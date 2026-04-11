@@ -274,6 +274,41 @@ class SolarReservePanel extends HTMLElement {
           </div>
         </div>
 
+        <!-- Raw Configuration Inputs -->
+        <div class="card">
+          <div class="card-header">Raw Configuration Inputs</div>
+          <div class="grid-2">
+            <div>
+              <div class="metric-row">
+                <span>Total Home Energy (Cumulative)</span>
+                <span id="raw-home" class="value">-</span>
+              </div>
+              <div class="metric-row">
+                <span>Managed Load Sensor (Cumulative)</span>
+                <span id="raw-managed" class="value">-</span>
+              </div>
+              <div class="metric-row">
+                <span>Battery Status Sensor (Raw)</span>
+                <span id="raw-battery" class="value">-</span>
+              </div>
+            </div>
+            <div>
+              <div class="metric-row">
+                <span>Solar Forecast Remaining Today</span>
+                <span id="raw-solar-today" class="value">-</span>
+              </div>
+              <div class="metric-row">
+                <span>Solar Forecast Tomorrow</span>
+                <span id="raw-solar-tom" class="value">-</span>
+              </div>
+              <div class="metric-row">
+                <span>Rated Energy Capacity</span>
+                <span id="raw-cap" class="value">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     `;
     this.content = true;
@@ -321,27 +356,39 @@ class SolarReservePanel extends HTMLElement {
       const eDay = parseFloat(attrs.avg_day_load_kwh) || 0;
       const eNight = parseFloat(attrs.avg_night_load_kwh) || 0;
       const tExp = eDay + eNight;
-      const tDef = parseFloat(attrs.tomorrow_deficit_kwh) || 0;
-      const solTom = Math.max(0, tExp - tDef);
 
       this.shadowRoot.getElementById('tom-expected').innerText = fw(tExp);
-      this.shadowRoot.getElementById('solar-tom').innerText = fw(solTom);
+      this.shadowRoot.getElementById('solar-tom').innerText = fw(attrs.raw_solar_tomorrow);
+      
+      // Update Raw Config Inputs
+      this.shadowRoot.getElementById('raw-home').innerText = fw(attrs.raw_home_energy);
+      this.shadowRoot.getElementById('raw-managed').innerText = fw(attrs.raw_managed_load);
+      this.shadowRoot.getElementById('raw-solar-today').innerText = fw(attrs.raw_solar_today);
+      this.shadowRoot.getElementById('raw-solar-tom').innerText = fw(attrs.raw_solar_tomorrow);
+      this.shadowRoot.getElementById('raw-battery').innerText = attrs.raw_battery_percent !== undefined && attrs.raw_battery_percent !== null ? attrs.raw_battery_percent + (attrs.raw_battery_percent <= 100 ? '%' : ' kWh') : '-';
+      
+      // Calculate isolated battery
+      if (data.batteryCap) {
+        const rawSolarToday = parseFloat(attrs.raw_solar_today);
+        const rawBattery = parseFloat(attrs.raw_battery_percent);
+        const cap = parseFloat(data.batteryCap.state);
+        
+        // Assume default % evaluation since raw inputs show it, but fallback if it was set to energy
+        const currentBattery = (rawBattery <= 100 && cap) ? (cap * rawBattery / 100) : rawBattery;
+        
+        this.shadowRoot.getElementById('batt-charge').innerText = fw(currentBattery);
+        this.shadowRoot.getElementById('solar-today').innerText = fw(rawSolarToday);
+      }
     }
 
     if (data.surplus) this.shadowRoot.getElementById('surplus-val').innerText = parseFloat(data.surplus.state).toFixed(2);
     if (data.available) this.shadowRoot.getElementById('total-assets').innerText = fw(data.available.state);
     if (data.required) this.shadowRoot.getElementById('total-liab').innerText = fw(data.required.state);
     
-    // Battery & Solar Today
-    if (data.batteryCap && data.available) {
-      // Current battery is stored inside 'available' in coordinator unless we do available - solar.
-      // Actually, we can derive solar_today if we assume available = battery_current + solar_today.
-      // We don't have battery_current raw, so we can't reliably isolate it perfectly without more sensors.
-      // Wait, let's keep it simple. (If you want exact tracking, pass battery_current in attributes later).
-      // Assuming batteryCap is the total cap:
+    // Battery Configs
+    if (data.batteryCap) {
       this.shadowRoot.getElementById('batt-cap').innerText = fw(data.batteryCap.state);
-      this.shadowRoot.getElementById('batt-charge').innerText = 'Included in Total';
-      this.shadowRoot.getElementById('solar-today').innerText = 'Included in Total';
+      this.shadowRoot.getElementById('raw-cap').innerText = fw(data.batteryCap.state);
     }
 
     if (data.actNight) {

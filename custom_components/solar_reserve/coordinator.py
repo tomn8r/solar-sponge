@@ -492,4 +492,17 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
         except ZeroDivisionError:
             self.calculated_data["estimated_runtime"] = 0.0
 
+        home_state = self._safe_float(self._get_config(CONF_TOTAL_HOME_ENERGY))
+        self.calculated_data["raw_home_energy"] = home_state
+        
+        load_entity = self._get_config(CONF_LOAD_ENERGY)
+        if load_entity:
+            self.calculated_data["raw_managed_load"] = self._safe_float(load_entity)
+        else:
+            self.calculated_data["raw_managed_load"] = 0.0
+
+        self.calculated_data["raw_solar_today"] = solar_today
+        self.calculated_data["raw_solar_tomorrow"] = solar_tomorrow
+        self.calculated_data["raw_battery_percent"] = battery_sensor_state
+
         self.async_set_updated_data(self.calculated_data)

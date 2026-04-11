@@ -59,4 +59,9 @@ class SolarReservePermission(CoordinatorEntity, BinarySensorEntity):
             "tomorrow_deficit_kwh": round(deficit, 2) if deficit is not None else None,
             "avg_night_load_kwh": round(avg_night, 2) if avg_night is not None else None,
             "avg_day_load_kwh": round(avg_day, 2) if avg_day is not None else None,
+            "raw_home_energy": data.get("raw_home_energy"),
+            "raw_managed_load": data.get("raw_managed_load"),
+            "raw_solar_today": data.get("raw_solar_today"),
+            "raw_solar_tomorrow": data.get("raw_solar_tomorrow"),
+            "raw_battery_percent": data.get("raw_battery_percent"),
         }
