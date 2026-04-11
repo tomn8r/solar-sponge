@@ -425,7 +425,9 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
 
             prorated_expected = avg_night_load * fraction_remaining
             normal_expected = max(0.0, avg_night_load - used_so_far_tonight)
-            load_expected = max(prorated_expected, normal_expected)
+            rest_of_night_load = max(prorated_expected, normal_expected)
+            rest_of_day_load = 0.0
+            load_expected = rest_of_night_load
 
             managed_load_used = self._get_usage_since(
                 self._get_config(CONF_LOAD_ENERGY), "sunset_ac_energy", "max_ac_energy_since_sunset"
@@ -454,9 +456,10 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             prorated_expected_day = avg_day_load * fraction_remaining
             normal_expected_day = max(0.0, avg_day_load - used_so_far_today)
             rest_of_day_load = max(prorated_expected_day, normal_expected_day)
+            rest_of_night_load = avg_night_load
             
             # Overall expected combines rest of day + full night
-            load_expected = rest_of_day_load + avg_night_load
+            load_expected = rest_of_day_load + rest_of_night_load
 
         # Append the morning buffer safely onto the expected load for the next dawn
         load_expected += morning_buffer_kwh
@@ -476,6 +479,12 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
         # --- Final surplus ---
         energy_required = load_expected + total_reserve
         self.calculated_data["energy_required_kwh"] = round(energy_required, 2)
+        
+        # --- UI Export Subcomponents ---
+        self.calculated_data["dyn_rest_of_day_kwh"] = round(rest_of_day_load, 2)
+        self.calculated_data["dyn_rest_of_night_kwh"] = round(rest_of_night_load, 2)
+        self.calculated_data["dyn_morning_buffer_kwh"] = round(morning_buffer_kwh, 2)
+        self.calculated_data["dyn_emergency_reserve_kwh"] = round(emergency_reserve, 2)
 
         # --- Data warm-up progress ---
         self.calculated_data["night_data_days"] = len(self.data_store.get("daily_loads", []))

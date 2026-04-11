@@ -290,7 +290,7 @@ class ResolvedBatteryCapacity(_SolarReserveSensorBase):
 
     def __init__(self, coordinator, entry):
         super().__init__(coordinator, entry)
-        self._attr_name = "Resolved Battery Capacity"
+        self._attr_name = "Battery Capacity"
         self._attr_unique_id = f"{entry.entry_id}_resolved_battery_capacity"
         self._attr_device_class = SensorDeviceClass.ENERGY
         self._attr_native_unit_of_measurement = UnitOfEnergy.KILO_WATT_HOUR

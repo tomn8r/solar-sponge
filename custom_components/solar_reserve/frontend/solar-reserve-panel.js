@@ -188,7 +188,7 @@ class SolarReservePanel extends HTMLElement {
               <span id="batt-charge" class="value">-</span>
             </div>
             <div class="metric-row sub-row">
-              <span>Resolved Capacity Utilized</span>
+              <span>Battery Capacity</span>
               <span id="batt-cap" class="value">-</span>
             </div>
             <div class="metric-row">
@@ -209,7 +209,16 @@ class SolarReservePanel extends HTMLElement {
               <span id="exp-load" class="value">-</span>
             </div>
             <div class="metric-row sub-row">
-              <span>Target Config: (Night + Next Day Buffers)</span>
+              <span>Rest of Day Target</span>
+              <span id="dyn-day" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Rest of Night Target</span>
+              <span id="dyn-night" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Next Morning Buffer</span>
+              <span id="dyn-buffer" class="value">-</span>
             </div>
             <div class="metric-row">
               <span>Tomorrow's Deficit</span>
@@ -222,6 +231,10 @@ class SolarReservePanel extends HTMLElement {
             <div class="metric-row sub-row">
               <span>Solar Output Tomorrow</span>
               <span id="solar-tom" class="value">-</span>
+            </div>
+            <div class="metric-row">
+              <span>Emergency Reserve Segment</span>
+              <span id="dyn-emerg" class="value">-</span>
             </div>
             <div class="metric-row total-row">
               <span>Total Energy Required</span>
@@ -350,7 +363,12 @@ class SolarReservePanel extends HTMLElement {
       
       // Dynamic loads
       this.shadowRoot.getElementById('exp-load').innerText = fw(attrs.dynamic_expected_load_kwh);
+      this.shadowRoot.getElementById('dyn-day').innerText = fw(attrs.dyn_rest_of_day_kwh);
+      this.shadowRoot.getElementById('dyn-night').innerText = fw(attrs.dyn_rest_of_night_kwh);
+      this.shadowRoot.getElementById('dyn-buffer').innerText = fw(attrs.dyn_morning_buffer_kwh);
+      
       this.shadowRoot.getElementById('tom-deficit').innerText = fw(attrs.tomorrow_deficit_kwh);
+      this.shadowRoot.getElementById('dyn-emerg').innerText = fw(attrs.dyn_emergency_reserve_kwh);
       
       // Calculate missing variables
       const eDay = parseFloat(attrs.avg_day_load_kwh) || 0;
