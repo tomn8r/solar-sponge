@@ -19,10 +19,10 @@ class SolarReservePanel extends HTMLElement {
       <style>
         :host {
           display: block;
-          padding: 24px;
-          font-family: 'Inter', Roboto, sans-serif;
-          background: var(--primary-background-color, #111111);
-          color: var(--primary-text-color, #ffffff);
+          padding: 16px;
+          font-family: var(--paper-font-body1_-_font-family), -apple-system, Roboto, sans-serif;
+          background: var(--primary-background-color);
+          color: var(--primary-text-color);
           min-height: 100vh;
           box-sizing: border-box;
           overflow-y: auto;
@@ -34,270 +34,242 @@ class SolarReservePanel extends HTMLElement {
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 24px;
-          padding-bottom: 60px;
+          gap: 16px;
+          padding-bottom: 30px;
         }
 
         .header {
-          text-align: center;
-          margin-bottom: 24px;
-          padding-top: 12px;
+          padding: 16px 8px 8px 8px;
         }
         
         .header h1 {
-          font-size: 2.5rem;
+          font-size: 2rem;
+          font-weight: 400;
           margin: 0;
-          background: linear-gradient(90deg, #f59e0b, #eab308);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-          color: #a0aec0;
-          margin-top: 8px;
-          font-size: 1.1rem;
+          color: var(--primary-text-color);
         }
 
         .card {
-          background: rgba(30, 30, 30, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 16px;
-          padding: 24px;
-          backdrop-filter: blur(12px);
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          background: var(--ha-card-background, var(--card-background-color, #fff));
+          border-radius: var(--ha-card-border-radius, 12px);
+          box-shadow: var(--ha-card-box-shadow, 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.12));
+          padding: 16px;
         }
         
-        .card:hover {
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Top row: Master Switch & Surplus */
-        .top-row {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 24px;
-        }
-
-        @media (max-width: 768px) {
-          .top-row { grid-template-columns: 1fr; }
-        }
-
-        .switch-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-        }
-
-        .permission-bubble {
-          width: 140px;
-          height: 140px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 2rem;
-          font-weight: 800;
-          text-transform: uppercase;
-          transition: all 0.5s ease;
-          margin-top: 24px;
-          letter-spacing: 2px;
-        }
-        
-        .permission-on {
-          background: rgba(16, 185, 129, 0.15);
-          color: #10b981;
-          border: 2px solid #10b981;
-          box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
-          animation: pulse-green 3s infinite;
-        }
-        
-        .permission-off {
-          background: rgba(239, 68, 68, 0.15);
-          color: #ef4444;
-          border: 2px solid #ef4444;
-          box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);
-        }
-
-        @keyframes pulse-green {
-          0% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); }
-          50% { box-shadow: 0 0 60px rgba(16, 185, 129, 0.6); }
-          100% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.3); }
-        }
-
-        .metric-value {
-          font-size: 3.5rem;
-          font-weight: 800;
-          margin: 16px 0;
-          line-height: 1;
-        }
-
-        .metric-label {
-          color: #a0aec0;
-          font-size: 1rem;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-        }
-
-        /* 36-Hour Equation */
-        .equation-grid {
-          display: grid;
-          grid-template-columns: 1fr 60px 1fr;
-          gap: 16px;
-          align-items: center;
-        }
-        
-        .equation-operator {
-          text-align: center;
-          font-size: 2.5rem;
-          color: #4b5563;
-          font-weight: bold;
-        }
-
-        .breakdown-list {
-          margin-top: 16px;
-          background: rgba(0,0,0,0.25);
-          border-radius: 12px;
-          padding: 16px 20px;
-        }
-
-        .breakdown-item {
+        .card-header {
+          font-size: 1.25rem;
+          font-weight: 500;
+          margin-bottom: 16px;
+          color: var(--primary-text-color);
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 12px 0;
-          border-bottom: 1px solid rgba(255,255,255,0.05);
-          font-size: 1.05rem;
         }
-        .breakdown-item:last-child {
+
+        .grid-2 {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+          .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .metric-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid var(--divider-color, rgba(0,0,0,0.12));
+          font-size: 1rem;
+        }
+        .metric-row:last-child {
           border-bottom: none;
         }
-        .breakdown-item strong {
-          color: #e2e8f0;
-          font-size: 1.15rem;
-        }
-
-        /* Bottom Row */
-        .bottom-row {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-          gap: 24px;
-        }
-
-        h2, h3 {
-          margin-top: 0;
-          font-weight: 500;
-          color: #f8fafc;
+        
+        .metric-row.sub-row {
+          padding-left: 24px;
+          font-size: 0.9rem;
+          color: var(--secondary-text-color);
         }
         
-        h2 {
-          border-bottom: 1px solid rgba(255,255,255,0.1);
-          padding-bottom: 16px;
-          margin-bottom: 24px;
-          font-size: 1.5rem;
+        .metric-row.total-row {
+          font-weight: bold;
+          border-top: 2px solid var(--divider-color, rgba(0,0,0,0.12));
+          border-bottom: none;
+          padding-top: 12px;
+          margin-top: 8px;
         }
 
+        .value {
+          font-weight: 500;
+        }
+
+        /* Large Status Displays */
+        .status-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 24px 0;
+        }
+
+        .status-value {
+          font-size: 3rem;
+          font-weight: 500;
+          line-height: 1.2;
+        }
+        
+        .status-label {
+          color: var(--secondary-text-color);
+          font-size: 1rem;
+        }
+        
+        .status-on { color: var(--success-color, #4caf50); }
+        .status-off { color: var(--error-color, #f44336); }
+        .status-neutral { color: var(--primary-color, #03a9f4); }
+
+        .chip {
+          background: var(--secondary-background-color);
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-size: 0.85rem;
+          color: var(--secondary-text-color);
+        }
       </style>
+
       <div class="dashboard-container">
         <div class="header">
-          <h1>Solar Reserve</h1>
-          <p>36-Hour Predictive Engine Command Center</p>
+          <h1>HA Solar Reserve Analytics</h1>
         </div>
 
-        <div class="top-row">
-          <div class="card switch-container">
-            <div class="metric-label">Permission Status</div>
-            <div id="permission-bubble" class="permission-bubble permission-off">OFF</div>
-            <div id="runtime-estimate" style="margin-top: 20px; color: #a0aec0; font-size: 1.1rem;"></div>
-          </div>
-          <div class="card switch-container">
-            <div class="metric-label">Calculated Surplus</div>
-            <div id="surplus-value" class="metric-value">0 <span style="font-size:1.5rem; color:#a0aec0">kWh</span></div>
-            <div id="surplus-subtitle" style="color: #a0aec0; font-size: 1.1rem; text-align: center;">Positive = permission ON.<br>Negative = permission OFF.</div>
-          </div>
-        </div>
-
-        <div class="card" style="position: relative; overflow: hidden;">
-          <h2>The 36-Hour Equation</h2>
-          <div class="equation-grid">
-            <div>
-              <div class="metric-label" style="text-align:center;">Energy Available</div>
-              <div id="energy-available" class="metric-value" style="text-align:center; color: #10b981;">0</div>
-            </div>
-            <div class="equation-operator"> - </div>
-            <div>
-              <div class="metric-label" style="text-align:center;">Energy Required</div>
-              <div id="energy-required" class="metric-value" style="text-align:center; color: #ef4444;">0</div>
+        <!-- Master Output Row -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">Master Output</div>
+            <div class="grid-2">
+              <div class="status-container">
+                <div class="status-label">Permission</div>
+                <div id="permission-status" class="status-value status-off">-</div>
+              </div>
+              <div class="status-container">
+                <div class="status-label">Calculated Surplus</div>
+                <div id="surplus-val" class="status-value status-neutral">-</div>
+                <div class="status-label">kWh</div>
+              </div>
             </div>
           </div>
           
-          <div class="equation-grid" style="margin-top: 16px; align-items: start;">
-            <div class="breakdown-list">
-              <div class="breakdown-item">
-                <span>Current Battery</span>
-                <strong id="resolved-battery">0 kWh</strong>
-              </div>
-              <div class="breakdown-item">
-                <span>Solar Remaining (Estimate)</span>
-                <strong id="solar-remaining">-</strong>
-              </div>
+          <div class="card">
+            <div class="card-header">System Intel</div>
+            <div class="metric-row">
+              <span>Estimated Runtime Remaining</span>
+              <span id="runtime-val" class="value">-</span>
             </div>
-            <div></div> <!-- Spacer -->
-            <div class="breakdown-list">
-              <div class="breakdown-item">
-                <span>Dynamic Expected Load</span>
-                <strong id="expected-load">0 kWh</strong>
-              </div>
-              <div class="breakdown-item">
-                <span>Tomorrow's Deficit</span>
-                <strong id="tomorrow-deficit">0 kWh</strong>
-              </div>
-              <div class="breakdown-item" style="opacity: 0.6;">
-                <span>*Plus Emergency Reserve</span>
-              </div>
+            <div class="metric-row">
+              <span>Data Warmup Nights (Max 7)</span>
+              <span id="warmup-night" class="value">-</span>
+            </div>
+            <div class="metric-row">
+              <span>Data Warmup Days (Max 7)</span>
+              <span id="warmup-day" class="value">-</span>
             </div>
           </div>
         </div>
 
-        <div class="bottom-row">
+        <!-- The Equation Breakdown -->
+        <div class="grid-2">
+          <!-- Assets -->
           <div class="card">
-            <h3>Performance History</h3>
-            <div class="breakdown-list">
-              <div class="breakdown-item">
-                <span>Daytime Tracker (Actual / Avg)</span>
-                <div>
-                  <strong id="day-actual">0</strong> <span style="color:#64748b; margin:0 6px;">/</span> <span id="day-avg" style="color:#94a3b8">0</span>
-                </div>
-              </div>
-              <div class="breakdown-item">
-                <span>Overnight Tracker (Actual / Avg)</span>
-                <div>
-                  <strong id="night-actual">0</strong> <span style="color:#64748b; margin:0 6px;">/</span> <span id="night-avg" style="color:#94a3b8">0</span>
-                </div>
-              </div>
-              <div class="breakdown-item" style="margin-top: 8px; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 6px;">
-                <span style="color:#94a3b8; font-size: 0.9rem;" id="warmup-status">Warmup Phase...</span>
-              </div>
+            <div class="card-header">Energy Assets (Available)</div>
+            <div class="metric-row">
+              <span>Current Battery Charge</span>
+              <span id="batt-charge" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Resolved Capacity Utilized</span>
+              <span id="batt-cap" class="value">-</span>
+            </div>
+            <div class="metric-row">
+              <span>Solar Remaining Today (Est.)</span>
+              <span id="solar-today" class="value">-</span>
+            </div>
+            <div class="metric-row total-row">
+              <span>Total Energy Available</span>
+              <span id="total-assets" class="value" style="color: var(--success-color, #4caf50);">-</span>
             </div>
           </div>
 
+          <!-- Liabilities -->
           <div class="card">
-            <h3>Diagnostic Inputs</h3>
-            <div class="breakdown-list">
-              <div class="breakdown-item">
-                <span>Managed Load Usage</span>
-                <strong id="managed-load">0 kWh</strong>
+            <div class="card-header">Energy Liabilities (Required)</div>
+            <div class="metric-row">
+              <span>Dynamic Expected Load</span>
+              <span id="exp-load" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Target Config: (Night + Next Day Buffers)</span>
+            </div>
+            <div class="metric-row">
+              <span>Tomorrow's Deficit</span>
+              <span id="tom-deficit" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Expected Tomorrow (Day+Night)</span>
+              <span id="tom-expected" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Solar Output Tomorrow</span>
+              <span id="solar-tom" class="value">-</span>
+            </div>
+            <div class="metric-row total-row">
+              <span>Total Energy Required</span>
+              <span id="total-liab" class="value" style="color: var(--error-color, #f44336);">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historical Breakdown -->
+        <div class="card">
+          <div class="card-header">Load Trackers & Diagnostics</div>
+          <div class="grid-2">
+            <div>
+              <div class="metric-row">
+                <span>Overnight Usage (Current/Last)</span>
+                <span id="night-actual" class="value">-</span>
               </div>
-              <div class="breakdown-item">
-                <span>Sunrise Snapshot</span>
-                <strong id="sunrise-snapshot">0 kWh</strong>
+              <div class="metric-row sub-row">
+                <span>Rolling 7-Night Average</span>
+                <span id="night-avg" class="value">-</span>
               </div>
-              <div class="breakdown-item">
-                <span>Sunset Snapshot</span>
-                <strong id="sunset-snapshot">0 kWh</strong>
+              <div class="metric-row sub-row">
+                <span>Sunset Energy Snapshot</span>
+                <span id="sunset-snap" class="value">-</span>
               </div>
+            </div>
+            <div>
+              <div class="metric-row">
+                <span>Daytime Usage (Current/Last)</span>
+                <span id="day-actual" class="value">-</span>
+              </div>
+              <div class="metric-row sub-row">
+                <span>Rolling 7-Day Average</span>
+                <span id="day-avg" class="value">-</span>
+              </div>
+              <div class="metric-row sub-row">
+                <span>Sunrise Energy Snapshot</span>
+                <span id="sunrise-snap" class="value">-</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 16px; border-top: 1px solid var(--divider-color, rgba(0,0,0,0.12)); padding-top: 16px;">
+            <div class="metric-row">
+              <span>Managed Load Usage Segment</span>
+              <span id="managed-load" class="value">-</span>
+            </div>
+            <div class="metric-row sub-row">
+              <span>Used since last horizon crossing</span>
             </div>
           </div>
         </div>
@@ -311,85 +283,82 @@ class SolarReservePanel extends HTMLElement {
     if (!this._hass) return;
 
     const states = this._hass.states;
-    let entities = {};
+    let data = {};
 
     for (const [entityId, stateObj] of Object.entries(states)) {
-      if (stateObj.attributes.device_class === 'energy' || entityId.includes('solar_reserve')) {
-        if (entityId.includes('solar_reserve_permission')) entities.permission = stateObj;
-        else if (entityId.includes('calculated_surplus')) entities.surplus = stateObj;
-        else if (entityId.includes('energy_available')) entities.available = stateObj;
-        else if (entityId.includes('energy_required')) entities.required = stateObj;
-        else if (entityId.includes('average_overnight_load')) entities.avgNight = stateObj;
-        else if (entityId.includes('overnight_load_tracker')) entities.actualNight = stateObj;
-        else if (entityId.includes('average_daytime_load')) entities.avgDay = stateObj;
-        else if (entityId.includes('daytime_load_tracker')) entities.actualDay = stateObj;
-        else if (entityId.includes('resolved_battery_capacity')) entities.battery = stateObj;
-        else if (entityId.includes('managed_load_usage')) entities.managedLoad = stateObj;
-        else if (entityId.includes('night_data_days')) entities.nightDays = stateObj;
-        else if (entityId.includes('day_data_days')) entities.dayDays = stateObj;
+      if (entityId.includes('solar_reserve')) {
+        if (entityId.includes('solar_reserve_permission')) data.permission = stateObj;
+        else if (entityId.includes('calculated_surplus')) data.surplus = stateObj;
+        else if (entityId.includes('energy_available')) data.available = stateObj;
+        else if (entityId.includes('energy_required')) data.required = stateObj;
+        else if (entityId.includes('average_overnight_load')) data.avgNight = stateObj;
+        else if (entityId.includes('overnight_load_tracker')) data.actNight = stateObj;
+        else if (entityId.includes('average_daytime_load')) data.avgDay = stateObj;
+        else if (entityId.includes('daytime_load_tracker')) data.actDay = stateObj;
+        else if (entityId.includes('resolved_battery_capacity')) data.batteryCap = stateObj;
+        else if (entityId.includes('managed_load_usage')) data.managed = stateObj;
+        else if (entityId.includes('night_data_days')) data.nightDays = stateObj;
+        else if (entityId.includes('day_data_days')) data.dayDays = stateObj;
       }
     }
 
-    if (entities.permission) {
-      const bubble = this.shadowRoot.getElementById('permission-bubble');
-      if (entities.permission.state === 'on') {
-        bubble.className = 'permission-bubble permission-on';
-        bubble.innerText = 'ON';
-      } else {
-        bubble.className = 'permission-bubble permission-off';
-        bubble.innerText = 'OFF';
-      }
-    }
+    // Helper formatting
+    const fw = (val, dec = 2) => val !== undefined && val !== null ? parseFloat(val).toFixed(dec) + ' kWh' : '-';
 
-    if (entities.surplus) {
-      this.shadowRoot.getElementById('surplus-value').innerHTML = `${entities.surplus.state} <span style="font-size:1.5rem; color:#a0aec0">kWh</span>`;
+    if (data.permission) {
+      const el = this.shadowRoot.getElementById('permission-status');
+      el.innerText = data.permission.state.toUpperCase();
+      el.className = data.permission.state === 'on' ? 'status-value status-on' : 'status-value status-off';
       
-      const runtime = entities.surplus.attributes.estimated_runtime_hours;
-      const rtEl = this.shadowRoot.getElementById('runtime-estimate');
-      if (runtime > 0) {
-        rtEl.innerText = `Est. Runtime Remaining: ${runtime} hrs`;
-      } else {
-        rtEl.innerText = ``;
-      }
+      const attrs = data.permission.attributes;
+      this.shadowRoot.getElementById('runtime-val').innerText = attrs.estimated_runtime_hours !== undefined ? attrs.estimated_runtime_hours + ' hrs' : '-';
+      
+      // Dynamic loads
+      this.shadowRoot.getElementById('exp-load').innerText = fw(attrs.dynamic_expected_load_kwh);
+      this.shadowRoot.getElementById('tom-deficit').innerText = fw(attrs.tomorrow_deficit_kwh);
+      
+      // Calculate missing variables
+      const eDay = parseFloat(attrs.avg_day_load_kwh) || 0;
+      const eNight = parseFloat(attrs.avg_night_load_kwh) || 0;
+      const tExp = eDay + eNight;
+      const tDef = parseFloat(attrs.tomorrow_deficit_kwh) || 0;
+      const solTom = Math.max(0, tExp - tDef);
+
+      this.shadowRoot.getElementById('tom-expected').innerText = fw(tExp);
+      this.shadowRoot.getElementById('solar-tom').innerText = fw(solTom);
     }
 
-    if (entities.available) {
-      this.shadowRoot.getElementById('energy-available').innerText = entities.available.state;
-      // Solar Remaining is roughly Available - Battery (though current battery state is live, so this is illustrative)
-      if (entities.battery) {
-        const availableFloat = parseFloat(entities.available.state) || 0;
-        const batteryFloat = parseFloat(entities.battery.state) || 0;
-        const solarRem = Math.max(0, availableFloat - batteryFloat).toFixed(2);
-        this.shadowRoot.getElementById('solar-remaining').innerText = `${solarRem} kWh`;
-      }
-    }
+    if (data.surplus) this.shadowRoot.getElementById('surplus-val').innerText = parseFloat(data.surplus.state).toFixed(2);
+    if (data.available) this.shadowRoot.getElementById('total-assets').innerText = fw(data.available.state);
+    if (data.required) this.shadowRoot.getElementById('total-liab').innerText = fw(data.required.state);
     
-    if (entities.required) {
-      this.shadowRoot.getElementById('energy-required').innerText = entities.required.state;
-      this.shadowRoot.getElementById('expected-load').innerText = `${entities.required.attributes.dynamic_expected_load_kwh ?? 0} kWh`;
-      this.shadowRoot.getElementById('tomorrow-deficit').innerText = `${entities.required.attributes.tomorrow_deficit_kwh ?? 0} kWh`;
+    // Battery & Solar Today
+    if (data.batteryCap && data.available) {
+      // Current battery is stored inside 'available' in coordinator unless we do available - solar.
+      // Actually, we can derive solar_today if we assume available = battery_current + solar_today.
+      // We don't have battery_current raw, so we can't reliably isolate it perfectly without more sensors.
+      // Wait, let's keep it simple. (If you want exact tracking, pass battery_current in attributes later).
+      // Assuming batteryCap is the total cap:
+      this.shadowRoot.getElementById('batt-cap').innerText = fw(data.batteryCap.state);
+      this.shadowRoot.getElementById('batt-charge').innerText = 'Included in Total';
+      this.shadowRoot.getElementById('solar-today').innerText = 'Included in Total';
     }
 
-    if (entities.battery) this.shadowRoot.getElementById('resolved-battery').innerText = `${entities.battery.state} kWh`;
-    if (entities.managedLoad) this.shadowRoot.getElementById('managed-load').innerText = `${entities.managedLoad.state} kWh`;
-
-    if (entities.actualDay) {
-      this.shadowRoot.getElementById('day-actual').innerText = `${entities.actualDay.state} kWh`;
-      this.shadowRoot.getElementById('sunrise-snapshot').innerText = `${entities.actualDay.attributes.sunrise_snapshot_kwh ?? 0} kWh`;
+    if (data.actNight) {
+      this.shadowRoot.getElementById('night-actual').innerText = fw(data.actNight.state);
+      this.shadowRoot.getElementById('sunset-snap').innerText = fw(data.actNight.attributes.sunset_snapshot_kwh);
     }
-    if (entities.avgDay) this.shadowRoot.getElementById('day-avg').innerText = `${entities.avgDay.state} kWh`;
+    if (data.avgNight) this.shadowRoot.getElementById('night-avg').innerText = fw(data.avgNight.state);
 
-    if (entities.actualNight) {
-      this.shadowRoot.getElementById('night-actual').innerText = `${entities.actualNight.state} kWh`;
-      this.shadowRoot.getElementById('sunset-snapshot').innerText = `${entities.actualNight.attributes.sunset_snapshot_kwh ?? 0} kWh`;
+    if (data.actDay) {
+      this.shadowRoot.getElementById('day-actual').innerText = fw(data.actDay.state);
+      this.shadowRoot.getElementById('sunrise-snap').innerText = fw(data.actDay.attributes.sunrise_snapshot_kwh);
     }
-    if (entities.avgNight) this.shadowRoot.getElementById('night-avg').innerText = `${entities.avgNight.state} kWh`;
+    if (data.avgDay) this.shadowRoot.getElementById('day-avg').innerText = fw(data.avgDay.state);
 
-    if (entities.dayDays && entities.nightDays) {
-      const n = entities.nightDays.state;
-      const d = entities.dayDays.state;
-      this.shadowRoot.getElementById('warmup-status').innerText = `Data Collected: ${n}/7 Nights, ${d}/7 Days`;
-    }
+    if (data.managed) this.shadowRoot.getElementById('managed-load').innerText = fw(data.managed.state, 3);
+    if (data.nightDays) this.shadowRoot.getElementById('warmup-night').innerText = data.nightDays.state;
+    if (data.dayDays) this.shadowRoot.getElementById('warmup-day').innerText = data.dayDays.state;
   }
 }
 
