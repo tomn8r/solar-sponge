@@ -70,12 +70,13 @@ class OvernightLoadTracker(_SolarReserveSensorBase):
     def native_value(self):
         """Return the state of the sensor."""
         val = self.coordinator.data.get("overnight_load_tracker", 0.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
     @property
     def extra_state_attributes(self):
+        val = self.coordinator.data_store.get("sunset_energy", 0.0)
         return {
-            "sunset_snapshot_kwh": round(self.coordinator.data_store.get("sunset_energy", 0.0), 2),
+            "sunset_snapshot_kwh": round(val, 2) if val is not None else None,
             "days_in_average": len(self.coordinator.data_store.get("daily_loads", [])),
         }
 
@@ -95,7 +96,7 @@ class AverageOvernightLoad(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("avg_night_load", 10.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
 
 class DaytimeLoadTracker(_SolarReserveSensorBase):
@@ -113,12 +114,13 @@ class DaytimeLoadTracker(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("daytime_load_tracker", 0.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
     @property
     def extra_state_attributes(self):
+        val = self.coordinator.data_store.get("sunrise_energy", 0.0)
         return {
-            "sunrise_snapshot_kwh": round(self.coordinator.data_store.get("sunrise_energy", 0.0), 2),
+            "sunrise_snapshot_kwh": round(val, 2) if val is not None else None,
             "days_in_average": len(self.coordinator.data_store.get("daily_day_loads", [])),
         }
 
@@ -138,7 +140,7 @@ class AverageDaytimeLoad(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("avg_day_load", 10.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
 
 # ---------------------------------------------------------------------------
@@ -164,14 +166,15 @@ class CalculatedSurplus(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("surplus_kwh", 0.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
     @property
     def extra_state_attributes(self):
         data = self.coordinator.data or {}
+        runtime = data.get("estimated_runtime", 0.0)
         return {
             "permission": data.get("permission", False),
-            "estimated_runtime_hours": round(data.get("estimated_runtime", 0.0), 1),
+            "estimated_runtime_hours": round(runtime, 1) if runtime is not None else None,
         }
 
 
@@ -194,7 +197,7 @@ class EnergyAvailable(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("energy_available_kwh", 0.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
 
 class EnergyRequired(_SolarReserveSensorBase):
@@ -217,14 +220,16 @@ class EnergyRequired(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("energy_required_kwh", 0.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
     @property
     def extra_state_attributes(self):
         data = self.coordinator.data or {}
+        load = data.get("dynamic_expected_load", 0.0)
+        deficit = data.get("tomorrow_deficit", 0.0)
         return {
-            "dynamic_expected_load_kwh": round(data.get("dynamic_expected_load", 0.0), 2),
-            "tomorrow_deficit_kwh": round(data.get("tomorrow_deficit", 0.0), 2),
+            "dynamic_expected_load_kwh": round(load, 2) if load is not None else None,
+            "tomorrow_deficit_kwh": round(deficit, 2) if deficit is not None else None,
         }
 
 
@@ -295,7 +300,7 @@ class ResolvedBatteryCapacity(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("resolved_battery_capacity_kwh", 10.0)
-        return round(val, 2)
+        return round(val, 2) if val is not None else None
 
 
 class ManagedLoadUsage(_SolarReserveSensorBase):
@@ -318,4 +323,4 @@ class ManagedLoadUsage(_SolarReserveSensorBase):
     @property
     def native_value(self):
         val = self.coordinator.data.get("managed_load_usage_kwh", 0.0)
-        return round(val, 3)
+        return round(val, 3) if val is not None else None

@@ -70,6 +70,9 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             "max_ac_energy_since_sunrise": 0.0,
         }
 
+        # Cache of the last valid floats read, allowing graceful degradation if sensors go offline
+        self._last_good_states = {}
+
         self.calculated_data = {
             "permission": False,
             "surplus_kwh": 0.0,
@@ -206,15 +209,18 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
                         "You must use a cumulative Energy sensor (kWh/Wh/MWh)!",
                         entity_id, unit
                     )
-                    return default
+                    return self._last_good_states.get(entity_id, default)
                 if unit == "Wh":
                     val = val / 1000.0
                 elif unit == "MWh":
                     val = val * 1000.0
+                    
+                self._last_good_states[entity_id] = val
                 return val
-            except ValueError:
-                return default
-        return default
+            except (ValueError, TypeError):
+                pass
+                
+        return self._last_good_states.get(entity_id, default)
 
     def _get_usage_since(self, entity_id, start_key, max_key):
         """Calculate energy used since a snapshot, handling daily resets."""
@@ -343,7 +349,11 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
         self.calculated_data["resolved_battery_capacity_kwh"] = round(capacity, 2)
 
         # --- Current battery level ---
-        battery_sensor_state = self._safe_float(self._get_config(CONF_BATTERY_REMAINING))
+        battery_sensor_state = self._safe_float(self._get_config(CONF_BATTERY_REMAINING), default=None)
+        if battery_sensor_state is None:
+            _LOGGER.debug("HA Solar Reserve: Battery sensor unavailable and no previous cache exists. Delaying recalculation.")
+            return
+            
         sensor_type = self._get_config(CONF_BATTERY_SENSOR_TYPE, "energy")
         current_battery = (
             capacity * (battery_sensor_state / 100.0)
@@ -351,8 +361,12 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             else battery_sensor_state
         )
 
-        solar_today = self._safe_float(self._get_config(CONF_SOLAR_REMAINING_TODAY))
-        solar_tomorrow = self._safe_float(self._get_config(CONF_SOLAR_TOMORROW))
+        solar_today = self._safe_float(self._get_config(CONF_SOLAR_REMAINING_TODAY), default=None)
+        if solar_today is None:
+            _LOGGER.debug("HA Solar Reserve: Solar today sensor unavailable and no previous cache exists. Delaying recalculation.")
+            return
+            
+        solar_tomorrow = self._safe_float(self._get_config(CONF_SOLAR_TOMORROW), default=0.0)
 
         energy_available = current_battery + solar_today
         self.calculated_data["energy_available_kwh"] = round(energy_available, 2)
@@ -381,9 +395,12 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
         last_sunrise_dt = parse_str_time(self.data_store.get("last_sunrise_time"))
         
         # Determine actual daylight duration for the buffer hourly rate (fallback to 12)
-        daylight_duration_secs = (last_sunset_dt - last_sunrise_dt).total_seconds()
-        daylight_hours = max(4.0, abs(daylight_duration_secs) / 3600.0)
-        morning_buffer_kwh = (avg_day_load / daylight_hours) * buffer_hours
+        try:
+            daylight_duration_secs = (last_sunset_dt - last_sunrise_dt).total_seconds()
+            daylight_hours = max(4.0, abs(daylight_duration_secs) / 3600.0)
+            morning_buffer_kwh = (avg_day_load / daylight_hours) * buffer_hours
+        except (TypeError, ZeroDivisionError):
+            morning_buffer_kwh = 0.0
 
         if is_night:
             home_used = self._get_usage_since(
@@ -468,8 +485,11 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
 
         self.calculated_data["surplus_kwh"] = surplus
         self.calculated_data["permission"] = surplus > 0
-        self.calculated_data["estimated_runtime"] = (
-            max(0.0, surplus / DEFAULT_APPLIANCE_POWER_KW) if surplus > 0 else 0.0
-        )
+        try:
+            self.calculated_data["estimated_runtime"] = (
+                max(0.0, surplus / DEFAULT_APPLIANCE_POWER_KW) if surplus > 0 else 0.0
+            )
+        except ZeroDivisionError:
+            self.calculated_data["estimated_runtime"] = 0.0
 
         self.async_set_updated_data(self.calculated_data)

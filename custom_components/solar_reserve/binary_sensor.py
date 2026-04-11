@@ -45,11 +45,18 @@ class SolarReservePermission(CoordinatorEntity, BinarySensorEntity):
     def extra_state_attributes(self):
         """Return extra diagnostic attributes."""
         data = self.coordinator.data or {}
+        surplus = data.get("surplus_kwh", 0.0)
+        runtime = data.get("estimated_runtime", 0.0)
+        dynamic_load = data.get("dynamic_expected_load", 10.0)
+        deficit = data.get("tomorrow_deficit", 0.0)
+        avg_night = data.get("avg_night_load", 10.0)
+        avg_day = data.get("avg_day_load", 10.0)
+        
         return {
-            "calculated_surplus_kwh": round(data.get("surplus_kwh", 0.0), 2),
-            "estimated_runtime_hours": round(data.get("estimated_runtime", 0.0), 1),
-            "dynamic_expected_load_kwh": round(data.get("dynamic_expected_load", 10.0), 2),
-            "tomorrow_deficit_kwh": round(data.get("tomorrow_deficit", 0.0), 2),
-            "avg_night_load_kwh": round(data.get("avg_night_load", 10.0), 2),
-            "avg_day_load_kwh": round(data.get("avg_day_load", 10.0), 2),
+            "calculated_surplus_kwh": round(surplus, 2) if surplus is not None else None,
+            "estimated_runtime_hours": round(runtime, 1) if runtime is not None else None,
+            "dynamic_expected_load_kwh": round(dynamic_load, 2) if dynamic_load is not None else None,
+            "tomorrow_deficit_kwh": round(deficit, 2) if deficit is not None else None,
+            "avg_night_load_kwh": round(avg_night, 2) if avg_night is not None else None,
+            "avg_day_load_kwh": round(avg_day, 2) if avg_day is not None else None,
         }
