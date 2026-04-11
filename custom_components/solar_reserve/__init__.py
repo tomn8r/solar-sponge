@@ -4,6 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from homeassistant.components import frontend
+from homeassistant.components.http import StaticPathConfig
 from .const import DOMAIN
 from .coordinator import SolarReserveCoordinator
 
@@ -17,11 +18,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Register the custom panel (only do this once if multiple entries exist)
     if "frontend_registered" not in hass.data[DOMAIN]:
-        hass.http.register_static_path(
-            "/solar_reserve_frontend",
-            hass.config.path("custom_components/solar_reserve/frontend"),
-            cache_headers=False,
-        )
+        await hass.http.async_register_static_paths([
+            StaticPathConfig(
+                "/solar_reserve_frontend",
+                hass.config.path("custom_components/solar_reserve/frontend"),
+                False,
+            )
+        ])
         frontend.async_register_built_in_panel(
             hass,
             component_name="custom",
