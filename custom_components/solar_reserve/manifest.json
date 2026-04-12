@@ -1,12 +1,14 @@
 {
   "domain": "solar_reserve",
   "name": "HA Solar Reserve",
-  "codeowners": [],
+  "codeowners": ["@tomn8r"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/tomn8r/HA-Solar-Reserve",
+  "issue_tracker": "https://github.com/tomn8r/HA-Solar-Reserve/issues",
   "integration_type": "hub",
   "iot_class": "calculated",
+  "loggers": ["custom_components.solar_reserve"],
   "requirements": [],
-  "version": "1.1.0-beta.3"
+  "version": "1.1.0-beta.4"
 }

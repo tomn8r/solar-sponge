@@ -1,23 +1,37 @@
 """Binary sensor platform for HA Solar Reserve."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN, NAME
 
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+    from .__init__ import SolarReserveConfigEntry
+    from .coordinator import SolarReserveCoordinator
 
-async def async_setup_entry(hass, entry, async_add_entities):
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: SolarReserveConfigEntry,
+    async_add_entities: AddEntitiesCallback,
+) -> None:
     """Set up the binary sensor platform."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = entry.runtime_data
     async_add_entities([SolarReservePermission(coordinator, entry)])
 
 
-class SolarReservePermission(CoordinatorEntity, BinarySensorEntity):
+class SolarReservePermission(CoordinatorEntity[SolarReserveCoordinator], BinarySensorEntity):
     """Representation of the HA Solar Reserve Permission sensor."""
 
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, entry):
+    def __init__(self, coordinator: SolarReserveCoordinator, entry: SolarReserveConfigEntry) -> None:
         """Initialize."""
         super().__init__(coordinator)
         self._entry = entry

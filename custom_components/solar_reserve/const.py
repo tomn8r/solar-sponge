@@ -1,4 +1,5 @@
 """Constants for the HA Solar Reserve integration."""
+from __future__ import annotations
 
 DOMAIN = "solar_reserve"
 NAME = "HA Solar Reserve"

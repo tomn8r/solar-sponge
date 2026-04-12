@@ -1,12 +1,15 @@
 """Coordinator for HA Solar Reserve."""
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+import datetime
 
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
-import datetime
 
 from .const import (
     DOMAIN,
@@ -27,16 +30,19 @@ from .const import (
     DEFAULT_MORNING_BUFFER_HOURS,
 )
 
+if TYPE_CHECKING:
+    from homeassistant.config_entries import ConfigEntry
+
 _LOGGER = logging.getLogger(__name__)
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.storage"
 
 
-class SolarReserveCoordinator(DataUpdateCoordinator):
+class SolarReserveCoordinator(DataUpdateCoordinator[dict]):
     """Class to manage fetching data from multiple states."""
 
-    def __init__(self, hass: HomeAssistant, entry):
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize."""
         super().__init__(
             hass,
@@ -45,7 +51,7 @@ class SolarReserveCoordinator(DataUpdateCoordinator):
             update_interval=None,
         )
         self.entry = entry
-        self._store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
+        self._store = Store[dict](hass, STORAGE_VERSION, STORAGE_KEY)
 
         # Persisted store: snapshot values and rolling load averages only
         self.data_store = {
